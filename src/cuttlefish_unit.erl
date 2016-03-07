@@ -25,15 +25,7 @@ render_template(FileName, Context) ->
     Str1 = re:replace(Str0, "\"", "\\\\\"", ReOpts),
 
     %% the mustache module is only available in the context of a rebar run.
-    case {code:ensure_loaded(mustache), code:ensure_loaded(rebar_mustache)} of
-        {{module, mustache}, _} ->
-            mustache:render(Str1, dict:from_list(Context));
-        {_, {module, rebar_mustache}} ->
-            rebar_mustache:render(Str1, dict:from_list(Context));
-        _ ->
-            io:format("mustache and/or rebar_mustache module not loaded. "
-                      "This test can only be run in a rebar context.~n")
-    end.
+    mustache:render(Str1, dict:from_list(Context)).
 
 -spec generate_config(atom(), [string()]|string(), list()) -> list().
 generate_config(strings, SchemaStrings, Conf) ->
