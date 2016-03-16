@@ -18,14 +18,7 @@ generate_templated_config(FileName, Conf, Context, PreexistingSchema) ->
 
 render_template(FileName, Context) ->
     {ok, Bin} = file:read_file(FileName),
-    %% Stolen from rebar_templater:render/2
-    %% Be sure to escape any double-quotes before rendering...
-    ReOpts = [global, {return, list}],
-    Str0 = re:replace(Bin, "\\\\", "\\\\\\", ReOpts),
-    Str1 = re:replace(Str0, "\"", "\\\\\"", ReOpts),
-
-    %% the mustache module is only available in the context of a rebar run.
-    mustache:render(Str1, dict:from_list(Context)).
+    mustache:render(binary_to_list(Bin), dict:from_list(Context)).
 
 -spec generate_config(atom(), [string()]|string(), list()) -> list().
 generate_config(strings, SchemaStrings, Conf) ->
