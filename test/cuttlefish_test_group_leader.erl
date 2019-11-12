@@ -19,6 +19,14 @@
 %% -------------------------------------------------------------------
 -module(cuttlefish_test_group_leader).
 
+-ifdef(OTP_RELEASE). %% this implies 21 or higher
+-define(EXCEPTION(Class, Reason, Stacktrace), Class:Reason:Stacktrace).
+-define(GET_STACK(Stacktrace), Stacktrace).
+-else.
+-define(EXCEPTION(Class, Reason, _), Class:Reason).
+-define(GET_STACK(_), erlang:get_stacktrace()).
+-endif.
+
 -export([new_group_leader/1, 
          group_leader_loop/2, 
          tidy_up/1,
@@ -83,7 +91,7 @@ io_request({put_chars, M, F, As}, Output) ->
         Chars ->
             {ok, queue:in(Chars, Output)}
     catch
-        C:T -> {{error, {C,T,erlang:get_stacktrace()}}, Output}
+        ?EXCEPTION(C, T, Stacktrace) -> {{error, {C,T,?GET_STACK(Stacktrace)}}, Output}
     end;
 io_request({put_chars, _Enc, Chars}, Output) ->
     io_request({put_chars, Chars}, Output);
